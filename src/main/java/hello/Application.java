@@ -7,11 +7,14 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.transaction.annotation.Transactional;
 
 import lombok.extern.slf4j.Slf4j;
 
 @SpringBootApplication
 @Slf4j
+@EnableTransactionManagement
 public class Application {
 
 	public static void main(String[] args) {
@@ -36,8 +39,8 @@ public class Application {
 			}
 		};
 	}
-
-	private void inject2Identical(ItemRepository repository) {
+	@Transactional
+	public void inject2Identical(ItemRepository repository) {
 		repository.save(new Item("a"));
 		repository.save(new Item("a"));
 	}
