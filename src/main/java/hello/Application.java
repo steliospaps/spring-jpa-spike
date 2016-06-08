@@ -19,29 +19,34 @@ import lombok.extern.slf4j.Slf4j;
 
 @SpringBootApplication
 @Slf4j
-@EnableTransactionManagement
-//@EnableJpaRepositories
+//@EnableTransactionManagement
 public class Application {
 
 	public static void main(String[] args) {
-		Item i = new Item();
 		log.info("starting");
 		SpringApplication.run(Application.class);
 	}
-
+/*
 	@Bean
 	public PlatformTransactionManager transactionManager(DataSource dataSource) {
 		return new DataSourceTransactionManager(dataSource);
 	}
-
-	@Bean TwoIdenticalItemPersister twoIdenticalItemPersister(){
-		return new TwoIdenticalItemPersister();
-	}
-	
+*/
 	@Bean
-	public CommandLineRunner demo(TransactionalVerifier ver) {
+	public CommandLineRunner demo(ItemRepository rep) {
 		return (args) -> {
-			ver.verifyTransationality();
+			log.info("count of items {}",rep.count());
+			log.info("deleteAll");
+			rep.deleteAll();
+			log.info("count of items {}",rep.count());
+			Item item = new Item("hello");
+			log.info("saving item {}",item);
+			item = rep.save(item);
+			log.info("saved item {}",item);
+			log.info("count of items {}",rep.count());
+			log.info("deleting item {}",item);
+			rep.delete(item);
+			log.info("count of items {}",rep.count());			
 		};
 	}
 }
