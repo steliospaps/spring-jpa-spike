@@ -12,6 +12,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 @SpringBootApplication
 @Slf4j
 @EnableTransactionManagement
-@EnableJpaRepositories
+//@EnableJpaRepositories
 public class Application {
 
 	public static void main(String[] args) {
@@ -38,25 +39,9 @@ public class Application {
 	}
 	
 	@Bean
-	public CommandLineRunner demo(ItemRepository repository, TwoIdenticalItemPersister per) {
+	public CommandLineRunner demo(TransactionalVerifier ver) {
 		return (args) -> {
-			repository.deleteAll();
-			try {
-				per.inject2Identical();
-				log.error("we should not be here");
-			} catch (DataIntegrityViolationException e) {
-				log.info("ignoring exception {}", e.getMessage());
-			}
-			long count = repository.count();
-			if (count != 0) {
-				throw new RuntimeException("partial data insertion detected");
-			}
+			ver.verifyTransationality();
 		};
-	}
-
-	@Transactional()
-	public void inject2Identical(ItemRepository repository) {
-		repository.save(new Item("a"));
-		repository.save(new Item("a"));
 	}
 }
